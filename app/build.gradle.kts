@@ -42,11 +42,11 @@ android {
 }
 
 dependencies {
-    // RootEncoder - Core library for video/audio encoding (must match RTSP-Server's dependency)
-    implementation("com.github.pedroSG94.RootEncoder:library:2.6.1")
+    // RootEncoder - Core library for video/audio encoding
+    implementation(project(":library"))
     
     // RTSP-Server - Plugin for RTSP server functionality
-    implementation("com.github.pedroSG94:RTSP-Server:1.3.6")
+    implementation(project(":rtspserver"))
     
     // AndroidX
     implementation("androidx.core:core-ktx:1.12.0")

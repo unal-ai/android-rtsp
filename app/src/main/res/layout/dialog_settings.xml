@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="设置"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="分辨率 (Resolution)"
+        android:textColor="#666666" />
+
+    <Spinner
+        android:id="@+id/spinnerResolution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="帧率 (Framerate)"
+        android:textColor="#666666" />
+
+    <Spinner
+        android:id="@+id/spinnerFps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="码率 (Bitrate)"
+            android:textColor="#666666" />
+        
+        <TextView
+            android:id="@+id/tvBitrateValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2.5 Mbps"
+            android:textColor="#666666" />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seekBarBitrate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="关键帧间隔 (I-Frame Interval - Seconds)"
+        android:textColor="#666666" />
+
+    <EditText
+        android:id="@+id/etIFrameInterval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="2"
+        android:inputType="number"
+        android:text="2" />
+
+    <Switch
+        android:id="@+id/switchLowLatency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="低延迟模式 (Low Latency)"
+        android:textSize="14sp"
+        android:textColor="#666666" />
+        
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="帧内刷新周期 (Intra Refresh Period - Frames)"
+        android:textColor="#666666" />
+
+    <EditText
+        android:id="@+id/etIntraRefreshPeriod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:hint="Optional (e.g., 10)"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnSaveSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="保存设置" />
+
+</LinearLayout>
