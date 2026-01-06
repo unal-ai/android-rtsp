@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Camera icon -->
+    <group
+        android:translateX="27"
+        android:translateY="27">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M44,18H36L32.6,13H21.4L18,18H10c-2.2,0 -4,1.8 -4,4v28c0,2.2 1.8,4 4,4h34c2.2,0 4,-1.8 4,-4V22C48,19.8 46.2,18 44,18zM27,44c-6.1,0 -11,-4.9 -11,-11c0,-6.1 4.9,-11 11,-11c6.1,0 11,4.9 11,11C38,39.1 33.1,44 27,44z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M27,26c-3.9,0 -7,3.1 -7,7c0,3.9 3.1,7 7,7c3.9,0 7,-3.1 7,-7C34,29.1 30.9,26 27,26z" />
+        <!-- RTSP signal waves -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M40,8c2.2,0 4,1.8 4,4c0,2.2 -1.8,4 -4,4"
+            android:strokeWidth="2"
+            android:strokeColor="#FFFFFF" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M44,4c3.3,0 6,2.7 6,6c0,3.3 -2.7,6 -6,6"
+            android:strokeWidth="2"
+            android:strokeColor="#FFFFFF" />
+    </group>
+</vector>

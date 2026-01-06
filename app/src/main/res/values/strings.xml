@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RTSP Camera</string>
+    <string name="start_streaming">开始推流</string>
+    <string name="stop_streaming">停止推流</string>
+    <string name="switch_camera">切换摄像头</string>
+    <string name="settings">设置</string>
+    <string name="copy_url">复制URL</string>
+    <string name="streaming">推流中</string>
+    <string name="not_streaming">未推流</string>
+    <string name="clients_count">连接数: %d</string>
+    <string name="permission_required">需要摄像头和麦克风权限</string>
+    <string name="url_copied">URL已复制到剪贴板</string>
+    <string name="camera_front">前置</string>
+    <string name="camera_back">后置</string>
+</resources>
