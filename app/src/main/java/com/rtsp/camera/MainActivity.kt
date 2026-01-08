@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
     private var prefFpsIndex = 0
     private var prefBitrate = 6000 * 1024 // Default to 6 Mbps
     private var prefIFrameInterval = 2 // Default 2 seconds
-    private var prefLowLatency = false
+    private var prefLowLatency = true
     private var prefIntraRefreshPeriod = 0
     private var nativeRatio: Float = 0f
 
@@ -130,8 +130,13 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
                 }
             }
             
+            
+
+            
             // Default to the first option (Max Native Resolution)
-            prefResolutionIndex = 0
+            // UPDATE: Find first resolution <= 720p (approx) to be default
+            val defaultIndex = supportedResolutions.indexOfFirst { it.height <= 720 }
+            prefResolutionIndex = if (defaultIndex != -1) defaultIndex else 0
 
         } catch (e: Exception) {
             addLog("Error loading camera capabilities: ${e.message}")
@@ -362,6 +367,9 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
                 camera.startStream()
                 isStreaming = true
                 
+                // Start mDNS broadcast
+                registerService(rtspPort)
+                
 
                 
                 updateUI()
@@ -389,6 +397,10 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
                 //    addLog("停止预览")
                 // }
             }
+            
+            // Stop mDNS broadcast
+            unregisterService()
+            
         } catch (e: Exception) {
             addLog("停止失败: ${e.message}")
         }
@@ -724,6 +736,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
             if (isStreaming) {
                 stopStreaming()
             }
+            unregisterService()
         } catch (e: Exception) {
             // Ignore errors on destroy
         }
@@ -747,6 +760,80 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
             }
         } catch (e: Exception) {
             android.util.Log.e(TAG, "Failed to request keyframe: ${e.message}", e)
+        }
+    }
+    
+    // =============================================================================================
+    // mDNS / NsdManager Implementation for "Trusted Auto-Connect"
+    // =============================================================================================
+    
+    private var nsdManager: android.net.nsd.NsdManager? = null
+    private var registrationListener: android.net.nsd.NsdManager.RegistrationListener? = null
+    private val SERVICE_TYPE = "_virtual-mouse._tcp."
+    private val SERVICE_NAME = "VirtualMouseCam"
+
+    private fun registerService(port: Int) {
+        // tear down any existing service first
+        unregisterService()
+
+        try {
+            nsdManager = getSystemService(Context.NSD_SERVICE) as android.net.nsd.NsdManager
+            
+            val serviceInfo = android.net.nsd.NsdServiceInfo().apply {
+                serviceName = SERVICE_NAME
+                serviceType = SERVICE_TYPE
+                setPort(port)
+                // Add TXT records for configuration
+                setAttribute("lowLatency", if (prefLowLatency) "1" else "0")
+                setAttribute("intraRefresh", prefIntraRefreshPeriod.toString())
+            }
+
+            registrationListener = object : android.net.nsd.NsdManager.RegistrationListener {
+                override fun onServiceRegistered(NsdServiceInfo: android.net.nsd.NsdServiceInfo) {
+                    val mServiceName = NsdServiceInfo.serviceName
+                    android.util.Log.d(TAG, "mDNS Service Registered: $mServiceName")
+                    runOnUiThread {
+                        addLog("mDNS广播开启: $mServiceName")
+                    }
+                }
+
+                override fun onRegistrationFailed(serviceInfo: android.net.nsd.NsdServiceInfo, errorCode: Int) {
+                    android.util.Log.e(TAG, "mDNS Registration Failed: Error $errorCode")
+                    runOnUiThread {
+                        addLog("mDNS广播失败: Error $errorCode")
+                    }
+                }
+
+                override fun onServiceUnregistered(arg0: android.net.nsd.NsdServiceInfo) {
+                    android.util.Log.d(TAG, "mDNS Service Unregistered")
+                }
+
+                override fun onUnregistrationFailed(serviceInfo: android.net.nsd.NsdServiceInfo, errorCode: Int) {
+                    android.util.Log.e(TAG, "mDNS Unregistration Failed: Error $errorCode")
+                }
+            }
+
+            nsdManager?.registerService(
+                serviceInfo, 
+                android.net.nsd.NsdManager.PROTOCOL_DNS_SD, 
+                registrationListener
+            )
+            
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "Failed to register mDNS service", e)
+            addLog("mDNS启动异常: ${e.message}")
+        }
+    }
+
+    private fun unregisterService() {
+        if (registrationListener != null) {
+            try {
+                nsdManager?.unregisterService(registrationListener)
+            } catch (e: Exception) {
+                android.util.Log.e(TAG, "Error unregistering mDNS service", e)
+            } finally {
+                registrationListener = null
+            }
         }
     }
 }

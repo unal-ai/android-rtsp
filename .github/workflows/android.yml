@@ -1,0 +1,53 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # Since the project is missing the wrapper jar, we rely on the setup-java or gradle-build-action
+    # to provide a gradle environment, OR we regenerat the wrapper.
+    # But usually 'setup-java' caches gradle but doesn't install the gradle binary if wrapper is used.
+    # Let's use the 'gradle-build-action' which handles wrapper Validation and distribution.
+    # If the wrapper is broken/missing, we might need to use 'gradle' command directly or fix wrapper.
+    # Let's try running with the repo's wrapper first, assuming the user might fix it or we rely on 'gradle' if wrapper fails.
+    # Actually, because we know wrapper jar is missing, let's try to install a specific gradle version or use 'gradle'
+    # command from the runner if available.
+    # However, standard practice is to use wrapper.
+    # For now, let's try to regenerate wrapper or use the installed gradle.
+    # Ubuntu runners normally have gradle installed.
+    
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: 8.11.1
+        
+    - name: Build with Gradle
+      run: gradle assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
