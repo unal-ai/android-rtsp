@@ -1,6 +1,6 @@
 [submodule "app/libraries/RTSP-Server"]
 	path = app/libraries/RTSP-Server
-	url = git@github.com:unal-ai/RTSP-Server.git
+	url = https://github.com/unal-ai/RTSP-Server.git
 [submodule "app/libraries/RootEncoder"]
 	path = app/libraries/RootEncoder
-	url = git@github.com:unal-ai/RootEncoder.git
+	url = https://github.com/unal-ai/RootEncoder.git
