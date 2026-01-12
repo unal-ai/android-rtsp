@@ -55,7 +55,8 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
     private var prefBitrate = 6000 * 1024 // Default to 6 Mbps
     private var prefIFrameInterval = 2 // Default 2 seconds
     private var prefLowLatency = true
-    private var prefIntraRefreshPeriod = 0
+    private var prefIntraRefreshPeriod = 10
+    private var prefMirror = false
     private var nativeRatio: Float = 0f
 
     private val supportedResolutions = mutableListOf<android.util.Size>()
@@ -168,6 +169,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
                     // Reload capabilities for the new camera (Front/Back)
                     loadCameraCapabilities()
                     updateCameraInfo()
+                    updateCameraFlip()
                     
                     if (isStreaming) {
                         showToast("已切换摄像头。当前分辨率仍为推流开始时的设置。")
@@ -313,6 +315,20 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
 
         } catch (e: Exception) {
             addLog("预览启动出错: ${e.message}")
+        }
+        updateCameraFlip()
+    }
+
+    private fun updateCameraFlip() {
+        try {
+            // Default behavior for front camera is mirrored.
+            // If prefMirror is FALSE (default), we want it NOT mirrored, so we FLIP it.
+            // If prefMirror is TRUE, we want it mirrored (raw), so we don't flip it.
+            // Back camera is never mirrored.
+            val flipHorizontal = if (isFrontCamera) !prefMirror else false
+            binding.openGlView.setCameraFlip(flipHorizontal, false)
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "Error setting camera flip", e)
         }
     }
 
@@ -472,6 +488,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
         val tvBitrateValue = dialogView.findViewById<android.widget.TextView>(com.rtsp.camera.R.id.tvBitrateValue)
         val etIFrameInterval = dialogView.findViewById<android.widget.EditText>(com.rtsp.camera.R.id.etIFrameInterval)
         val switchLowLatency = dialogView.findViewById<android.widget.Switch>(com.rtsp.camera.R.id.switchLowLatency)
+        val switchMirror = dialogView.findViewById<android.widget.Switch>(com.rtsp.camera.R.id.switchMirror)
         val etIntraRefreshPeriod = dialogView.findViewById<android.widget.EditText>(com.rtsp.camera.R.id.etIntraRefreshPeriod)
         val btnSave = dialogView.findViewById<android.widget.Button>(com.rtsp.camera.R.id.btnSaveSettings)
 
@@ -552,6 +569,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
 
         // Setup Low Latency and Intra Refresh
         switchLowLatency.isChecked = prefLowLatency
+        switchMirror.isChecked = prefMirror
         if (prefIntraRefreshPeriod > 0) {
             etIntraRefreshPeriod.setText(prefIntraRefreshPeriod.toString())
         }
@@ -573,6 +591,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
             
             // Save Low Latency and Intra Refresh
             prefLowLatency = switchLowLatency.isChecked
+            prefMirror = switchMirror.isChecked
             val intraStr = etIntraRefreshPeriod.text.toString()
             prefIntraRefreshPeriod = intraStr.toIntOrNull() ?: 0
             
@@ -581,6 +600,7 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
             android.util.Log.i(TAG, "Settings saved: lowLatency=$prefLowLatency, intraRefresh=$prefIntraRefreshPeriod")
             
             updateCameraInfo()
+            updateCameraFlip()
             if (isStreaming) {
                 showToast("设置已保存 (部分即时生效)")
             } else {
@@ -657,6 +677,11 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 loadCameraCapabilities() // Load capabilities after permission
                 initializeCamera()
+                
+                // Ensure server is set up if surface is already ready
+                if (binding.openGlView.holder.surface.isValid && rtspServerCamera2 == null) {
+                   setupRtspServer()
+                }
             } else {
                 showToast("需要摄像头和麦克风权限")
                 finish()
