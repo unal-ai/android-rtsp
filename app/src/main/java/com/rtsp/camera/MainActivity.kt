@@ -327,6 +327,12 @@ class MainActivity : AppCompatActivity(), ConnectChecker, SurfaceHolder.Callback
             // Back camera is never mirrored.
             val flipHorizontal = if (isFrontCamera) !prefMirror else false
             binding.openGlView.setCameraFlip(flipHorizontal, false)
+            
+            // Enforce WYSIWYG: Disable separate flips, rely on setCameraFlip
+            binding.openGlView.setIsStreamHorizontalFlip(false)
+            binding.openGlView.setIsPreviewHorizontalFlip(false)
+            binding.openGlView.setIsStreamVerticalFlip(false)
+            binding.openGlView.setIsPreviewVerticalFlip(false)
         } catch (e: Exception) {
             android.util.Log.e(TAG, "Error setting camera flip", e)
         }
